@@ -390,6 +390,19 @@ static ngx_command_t datadog_commands[] = {
     },
 #endif
 
+#ifdef WITH_RUM
+    {
+      ngx_string("datadog_rum"),
+      NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_CONF_FLAG,
+      ngx_conf_set_flag_slot, NGX_HTTP_LOC_CONF_OFFSET, offsetof(datadog_loc_conf_t, rum_enable), NULL
+    },
+    {
+      ngx_string("datadog_rum_configuration"),
+      NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_CONF_FLAG,
+      set_datadog_rum_configuration, NGX_HTTP_LOC_CONF_OFFSET, 0, NULL
+    },
+#endif
+
     ngx_null_command
 };
 
@@ -484,11 +497,6 @@ static ngx_int_t datadog_master_process_post_config(
     return NGX_OK;
   }
 
-#ifdef WITH_WAF
-  ngx_http_next_output_body_filter = ngx_http_top_body_filter;
-  ngx_http_top_body_filter = output_body_filter;
-#endif
-
   // Forward tracer-specific environment variables to worker processes.
   auto push_to_main_conf = [main_conf](std::string env_var_name) {
     if (const char *value = std::getenv(env_var_name.c_str())) {
@@ -500,6 +508,7 @@ static ngx_int_t datadog_master_process_post_config(
        TracingLibrary::environment_variable_names()) {
     push_to_main_conf(std::string{env_var_name});
   }
+
 #ifdef WITH_WAF
   for (const std::string_view &env_var_name :
        security::Library::environment_variable_names()) {
@@ -511,6 +520,12 @@ static ngx_int_t datadog_master_process_post_config(
 }
 
 static ngx_int_t datadog_module_init(ngx_conf_t *cf) noexcept {
+  ngx_http_next_header_filter = ngx_http_top_header_filter;
+  ngx_http_top_header_filter = on_header_filter;
+
+  ngx_http_next_output_body_filter = ngx_http_top_body_filter;
+  ngx_http_top_body_filter = on_output_body_filter;
+
   auto core_main_config = static_cast<ngx_http_core_main_conf_t *>(
       ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module));
   auto main_conf = static_cast<datadog_main_conf_t *>(
@@ -662,6 +677,11 @@ static void *create_datadog_loc_conf(ngx_conf_t *conf) noexcept {
     return nullptr;  // error
   }
 
+#ifdef WITH_RUM
+  loc_conf->rum_enable = NGX_CONF_UNSET;
+  loc_conf->rum_snippet = nullptr;
+#endif
+
   // Trace ID and span ID are automatically added to the access log by altering
   // the default log format to be one defined by this module.  We need to
   // inject `log_format` directives as soon as possible within the `http` block
@@ -801,6 +821,14 @@ static char *merge_datadog_loc_conf(ngx_conf_t *cf, void *parent,
 #ifdef WITH_WAF
   if (conf->waf_pool == nullptr) {
     conf->waf_pool = prev->waf_pool;
+  }
+#endif
+
+#ifdef WITH_RUM
+  ngx_conf_merge_value(conf->rum_enable, prev->rum_enable, 0);
+  ngx_conf_merge_str_value(conf->rum_config_file, prev->rum_config_file, "");
+  if (conf->rum_snippet == nullptr) {
+    conf->rum_snippet = prev->rum_snippet;
   }
 #endif
 

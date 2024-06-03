@@ -11,7 +11,8 @@ extern const char *datadog_version_tracer;
 const char *datadog_version_tracer = datadog::tracing::tracer_version;
 
 extern const char datadog_version_nginx_mod[];
-const char datadog_version_nginx_mod[] = "[nginx_mod version @PROJECT_VERSION@]";
+const char datadog_version_nginx_mod[] =
+    "[nginx_mod version @PROJECT_VERSION@]";
 
 extern const char datadog_version_nginx[];
 const char datadog_version_nginx[] = "[nginx version " NGINX_VERSION "]";
@@ -22,5 +23,13 @@ const char *datadog_version_waf_rules = "[waf_rules version @RULES_VERSION@]";
 
 extern const char *datadog_version_libddwaf;
 const char *datadog_version_libddwaf = "[libddwaf version @LIBDDWAF_VERSION@]";
+#endif
+
+#ifdef WITH_RUM
+// TODO: `include_version` not working. Find a way to make cbindgen generate the
+// version from cargo.toml
+/*#include <injectbrowsersdk.h>*/
+extern const char datadog_version_rum_injector[];
+const char datadog_version_rum_injector[] = "[rum_injector version 0.1.0]";
 #endif
 }

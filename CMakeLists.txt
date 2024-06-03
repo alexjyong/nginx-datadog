@@ -15,6 +15,7 @@ cmake_policy(SET CMP0135 NEW)
 project(ngx_http_datadog_module VERSION 1.2.0)
 
 option(NGINX_DATADOG_ASM_ENABLED "Build with libddwaf" ON)
+option(NGINX_DATADOG_RUM_ENABLED "Build with RUM injection" OFF)
 set(NGINX_SRC_DIR "" CACHE PATH "The path to a directory with nginx sources")
 set(NGINX_VERSION "" CACHE STRING "The nginx version")
 if (NGINX_SRC_DIR STREQUAL "" AND NGINX_VERSION STREQUAL "")
@@ -22,6 +23,10 @@ if (NGINX_SRC_DIR STREQUAL "" AND NGINX_VERSION STREQUAL "")
 endif()
 option(NGINX_PATCH_AWAY_LIBC "Patch away libc dependency" OFF)
 option(NGINX_COVERAGE "Add coverage instrumentation" OFF)
+
+if (NGINX_DATADOG_RUM_ENABLED AND NGINX_DATADOG_ASM_ENABLED)
+  message(FATAL_ERROR "ASM and RUM features are mutually exclusive")
+endif ()
 
 # Make curl link against a static zlib (requires cmake 3.24)
 set(ZLIB_USE_STATIC_LIBS ON)
@@ -76,6 +81,11 @@ configure_file(src/version.cpp.in ${CMAKE_BINARY_DIR}/version.cpp)
 # The shared library (nginx module) that we are building.
 add_library(ngx_http_datadog_module SHARED)
 
+if(NGINX_DATADOG_RUM_ENABLED)
+  add_subdirectory(deps)
+  add_dependencies(ngx_http_datadog_module injectbrowsersdk)
+endif()
+
 target_sources(ngx_http_datadog_module
   PRIVATE
     src/array_util.cpp
@@ -111,6 +121,16 @@ if(NGINX_DATADOG_ASM_ENABLED)
     src/security/header_tags.cpp
     src/security/library.cpp)
   target_compile_definitions(ngx_http_datadog_module PRIVATE WITH_WAF)
+endif()
+if(NGINX_DATADOG_RUM_ENABLED)
+  target_sources(ngx_http_datadog_module
+    PRIVATE
+    src/rum/injection.cpp
+  )
+  target_compile_definitions(ngx_http_datadog_module PRIVATE WITH_RUM)
+
+  target_link_libraries(ngx_http_datadog_module injectbrowsersdk)
+
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -156,9 +176,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set_target_properties(ngx_http_datadog_module PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
   target_link_options(ngx_http_datadog_module PRIVATE "-Wl,--version-script=${LINKER_SCRIPT}")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(EXPORTED_SYMBOLS ${CMAKE_SOURCE_DIR}/nginx_module.exported)
-  set_target_properties(ngx_http_datadog_module PROPERTIES LINK_DEPENDS ${EXPORTED_SYMBOLS})
-  target_link_options(ngx_http_datadog_module PRIVATE "-Wl,-exported_symbols_list" "-Wl,${EXPORTED_SYMBOLS}")
+  # set(EXPORTED_SYMBOLS ${CMAKE_SOURCE_DIR}/nginx_module.ld)
+  # set_target_properties(ngx_http_datadog_module PROPERTIES LINK_DEPENDS ${EXPORTED_SYMBOLS})
+  # target_link_options(ngx_http_datadog_module PRIVATE "-Wl,-exported_symbols_list" "-Wl,${EXPORTED_SYMBOLS}")
+  target_link_options(ngx_http_datadog_module PRIVATE -undefined dynamic_lookup)
 endif()
 
 if(NGINX_PATCH_AWAY_LIBC)

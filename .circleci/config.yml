@@ -2,6 +2,12 @@
 version: 2.1
 orbs:
   codecov: codecov/codecov@4.1.0
+
+parameters:
+  build_all:
+    type: boolean
+    default: false
+
 release_tag_only: &release_tag_only
   filters:
     tags:
@@ -35,6 +41,12 @@ jobs:
         enum:
         - 'ON'
         - 'OFF'
+      rum:
+        type: enum
+        enum:
+        - 'ON'
+        - 'OFF'
+        default: 'OFF'
     steps:
     - checkout
     - run: git submodule sync && git submodule update --init --recursive
@@ -69,6 +81,7 @@ jobs:
       ARCH: x86_64
       MAKE_JOB_COUNT: 8
       WAF: "<< parameters.waf >>"
+      RUM: "<< parameters.rum >>"
       NGINX_VERSION: "<< parameters.nginx-version >>"
   build_arm64:
     parameters:
@@ -79,6 +92,12 @@ jobs:
         enum:
         - 'ON'
         - 'OFF'
+      rum:
+        type: enum
+        enum:
+        - 'ON'
+        - 'OFF'
+        default: 'OFF'
     steps:
     - checkout
     - run: git submodule sync && git submodule update --init --recursive
@@ -108,6 +127,7 @@ jobs:
       ARCH: aarch64
       MAKE_JOB_COUNT: 8
       WAF: "<< parameters.waf >>"
+      RUM: "<< parameters.rum >>"
       NGINX_VERSION: "<< parameters.nginx-version >>"
   coverage:
     environment:
@@ -115,6 +135,9 @@ jobs:
     steps:
     - checkout
     - run: git submodule sync && git submodule update --init --recursive
+    - run:
+        name: Install Python dependencies
+        command: pip install -r requirements.txt
     - run: echo -e "ARCH=amd64\nBASE_IMAGE=nginx:1.26.0\n" > nginx-version-info
     - run:
         command: 'make coverage'
@@ -124,6 +147,7 @@ jobs:
           BUILD_TYPE: RelWithDebInfo
           NGINX_VERSION: 1.26.0
           WAF: ON
+          RUM: OFF
     - codecov/upload:
         upload_args: '--disable-search'
         file: .musl-build/coverage.lcov
@@ -142,6 +166,9 @@ jobs:
         type: string
       waf:
         type: string
+      rum:
+        type: string
+        default: 'OFF'
     executor:
       name: docker-<< parameters.arch >>
       image: cimg/python:3.10.13
@@ -149,8 +176,12 @@ jobs:
       # https://github.com/containers/podman/issues/13889
       DOCKER_BUILDKIT: 1
       WAF: "<< parameters.waf >>"
+      RUM: "<< parameters.rum >>"
     steps:
     - checkout
+    - run:
+        name: Install Python dependencies
+        command: pip install -r requirements.txt
     - attach_workspace:
         at: "/tmp/workspace"
     - run: mv -v /tmp/workspace/.musl-build/ngx_http_datadog_module.so* test/services/nginx/
@@ -170,7 +201,7 @@ jobs:
     - run:
         name: Install Python dependencies
         command: |
-          pip install yapf
+          pip install -r requirements.txt
           update-alternatives --install /usr/local/bin/yapf3 yapf3 /usr/local/bin/yapf 100
     - run: make lint
   shellcheck:
@@ -183,6 +214,8 @@ jobs:
         SC1071,SC1091,SC2317
 workflows:
   build-and-test:
+    when:
+      not: << pipeline.git.tag >>
     jobs:
     - format
     - shellcheck:
@@ -286,10 +319,13 @@ workflows:
           tags:
             ignore: "/^v[0-9]+\\.[0-9]+\\.[0-9]+/"
   build-and-test-all:
+    when:
+      or:
+        -  << pipeline.parameters.build_all >>
+        - matches: { pattern: "^v[0-9]+\\.[0-9]+\\.[0-9]+", value: << pipeline.git.tag >> }
     jobs:
     # output of bin/generate_jobs_yaml.rb
     - build_amd64:
-        <<: *release_tag_only
         matrix:
           parameters:
             nginx-version:
@@ -309,11 +345,11 @@ workflows:
             - 1.25.5
             - 1.26.0
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
         name: build << matrix.nginx-version >> on amd64 WAF << matrix.waf >>
     - build_arm64:
-        <<: *release_tag_only
         matrix:
           parameters:
             nginx-version:
@@ -333,19 +369,20 @@ workflows:
             - 1.25.5
             - 1.26.0
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
         name: build << matrix.nginx-version >> on arm64 WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - amazonlinux:2023.3.20240219.0
             - nginx:1.24.0-alpine
@@ -356,15 +393,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - amazonlinux:2.0.20230418.0
             - amazonlinux:2.0.20230320.0
@@ -393,15 +430,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.26.0-alpine
             - nginx:1.26.0
@@ -411,15 +448,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.25.5-alpine
             - nginx:1.25.5
@@ -429,15 +466,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.25.4-alpine
             - nginx:1.25.4
@@ -447,15 +484,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.25.3-alpine
             - nginx:1.25.3
@@ -465,15 +502,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.25.2-alpine
             - nginx:1.25.2
@@ -483,15 +520,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.25.1-alpine
             - nginx:1.25.1
@@ -501,15 +538,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.25.0-alpine
             - nginx:1.25.0
@@ -519,15 +556,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.23.4-alpine
             - nginx:1.23.4
@@ -537,15 +574,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.23.3-alpine
             - nginx:1.23.3
@@ -555,15 +592,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.23.2-alpine
             - nginx:1.23.2
@@ -573,15 +610,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.23.1-alpine
             - nginx:1.23.1
@@ -591,15 +628,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.23.0-alpine
             - nginx:1.23.0
@@ -609,15 +646,15 @@ workflows:
         requires:
         - build << matrix.nginx-version >> on << matrix.arch >> WAF << matrix.waf >>
     - test:
-        <<: *release_tag_only
         matrix:
           parameters:
             arch:
             - amd64
             - arm64
             waf:
-            - 'ON'
             - 'OFF'
+            rum:
+            - 'ON'
             base-image:
             - nginx:1.22.0-alpine
             - nginx:1.22.0

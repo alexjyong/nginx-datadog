@@ -85,5 +85,12 @@ char *waf_thread_pool_name(ngx_conf_t *cf, ngx_command_t *command,
                            void *conf) noexcept;
 #endif
 
+#ifdef WITH_RUM
+char *set_datadog_rum_configuration(ngx_conf_t *cf, ngx_command_t *command,
+                                    void *conf);
+char *set_datadog_rum_enable(ngx_conf_t *cf, ngx_command_t *command,
+                             void *conf);
+#endif
+
 }  // namespace nginx
 }  // namespace datadog
