@@ -85,17 +85,19 @@ ngx_int_t DatadogContext::on_header_filter(ngx_http_request_t *request) {
   }
 
 #ifdef WITH_RUM
-  auto *trace = find_trace(request);
-  if (trace != nullptr) {
-    auto rum_span = trace->active_span().create_child();
-    rum_span.set_name("rum_sdk_injection.on_header");
-    auto status =
-        rum_ctx_.on_header_filter(request, loc_conf, next_header_filter_);
-    if (status == NGX_ERROR) {
-      rum_span.set_error(true);
+  if (loc_conf->rum_enable) {
+    auto *trace = find_trace(request);
+    if (trace != nullptr) {
+      auto rum_span = trace->active_span().create_child();
+      rum_span.set_name("rum_sdk_injection.on_header");
+      auto status =
+          rum_ctx_.on_header_filter(request, loc_conf, next_header_filter_);
+      if (status == NGX_ERROR) {
+        rum_span.set_error(true);
+      }
+    } else {
+      rum_ctx_.on_header_filter(request, loc_conf, next_header_filter_);
     }
-  } else {
-    rum_ctx_.on_header_filter(request, loc_conf, next_header_filter_);
   }
 #endif
 
@@ -127,22 +129,25 @@ ngx_int_t DatadogContext::on_output_body_filter(ngx_http_request_t *request,
 
 #ifdef WITH_RUM
   // TODO: If WAF is blocking, no need to inject the RUM SDK.
-  auto *trace = find_trace(request);
-  if (trace != nullptr) {
-    auto rum_span = trace->active_span().create_child();
-    rum_span.set_name("rum_sdk_injection.on_body_filter");
-    rum_span.set_tag("configuration.location",
-                     to_string_view(loc_conf->rum_config_file));
-    rum_span.set_tag("configuration.length",
-                     std::to_string(loc_conf->rum_snippet->length));
-    auto status =
-        rum_ctx_.on_body_filter(request, loc_conf, chain, next_body_filter_);
-    if (status == NGX_ERROR) {
-      rum_span.set_error(true);
+  if (loc_conf->rum_enable) {
+    auto *trace = find_trace(request);
+    if (trace != nullptr) {
+      auto rum_span = trace->active_span().create_child();
+      rum_span.set_name("rum_sdk_injection.on_body_filter");
+      rum_span.set_tag("configuration.location",
+                       to_string_view(loc_conf->rum_config_file));
+      rum_span.set_tag("configuration.length",
+                       std::to_string(loc_conf->rum_snippet->length));
+      auto status =
+          rum_ctx_.on_body_filter(request, loc_conf, chain, next_body_filter_);
+      if (status == NGX_ERROR) {
+        rum_span.set_error(true);
+      }
+      return status;
+    } else {
+      return rum_ctx_.on_body_filter(request, loc_conf, chain,
+                                     next_body_filter_);
     }
-    return status;
-  } else {
-    return rum_ctx_.on_body_filter(request, loc_conf, chain, next_body_filter_);
   }
 #endif
 

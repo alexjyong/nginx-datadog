@@ -6,6 +6,7 @@ extern "C" {
 
 #include "datadog_conf.h"
 #include "ngx_http_datadog_module.h"
+#include "string_util.h"
 #include "utils.h"
 
 namespace datadog {
@@ -14,10 +15,8 @@ namespace rum {
 namespace {
 
 ngx_int_t dd_validate_content_type(ngx_str_t *content_type) {
-  static const ngx_str_t html_content_type = ngx_string("text/html");
-  return content_type->len == html_content_type.len &&
-         ngx_strncmp(content_type->data, html_content_type.data,
-                     html_content_type.len) == 0;
+  std::string_view content_type_sv = to_string_view(*content_type);
+  return content_type_sv.find("text/html") != content_type_sv.npos;
 }
 
 // TODO: Add support for other `Content-Encoding`.
