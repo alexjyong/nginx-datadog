@@ -15,6 +15,7 @@ install() {
 # for downloading releases of build dependencies, unpacking them, and building them
 install build-essential libtool autoconf unzip wget tar curl git ca-certificates
 
+install install libcurl4-openssl-dev
 # nproc, etc.
 install coreutils
 
