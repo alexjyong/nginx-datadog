@@ -15,13 +15,6 @@ executors:
     docker:
       - image: << parameters.image >>
     resource_class: large
-  docker-arm64:
-    parameters:
-      image:
-        type: string
-    docker:
-      - image: << parameters.image >>
-    resource_class: arm.large
 
 jobs:
   build:
@@ -154,7 +147,7 @@ workflows:
     - build:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "build on amazonlinux:2023.3.20240219.0-<< matrix.arch >>"
         base-image: "amazonlinux:2023.3.20240219.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2023.3.20240219.0"
@@ -165,7 +158,7 @@ workflows:
     - test:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "test on amazonlinux:2023.3.20240219.0-<< matrix.arch >>"
         base-image: "amazonlinux:2023.3.20240219.0"
         requires:
@@ -176,7 +169,7 @@ workflows:
     - build:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "build on amazonlinux:2.0.20230418.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230418.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20230418.0"
@@ -187,7 +180,7 @@ workflows:
     - test:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "test on amazonlinux:2.0.20230418.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230418.0"
         requires:
@@ -198,7 +191,7 @@ workflows:
     - build:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "build on nginx:1.25.4-alpine-<< matrix.arch >>"
         base-image: "nginx:1.25.4-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.4-alpine"
@@ -209,7 +202,7 @@ workflows:
     - test:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "test on nginx:1.25.4-alpine-<< matrix.arch >>"
         base-image: "nginx:1.25.4-alpine"
         requires:
@@ -220,7 +213,7 @@ workflows:
     - build:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "build on nginx:1.25.4-<< matrix.arch >>"
         base-image: "nginx:1.25.4"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.4"
@@ -231,7 +224,7 @@ workflows:
     - test:
         matrix:
           parameters:
-            arch: ["amd64", "arm64"]
+            arch: "amd64"
         name: "test on nginx:1.25.4-<< matrix.arch >>"
         base-image: "nginx:1.25.4"
         requires:
@@ -247,7 +240,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2023.3.20240219.0-<< matrix.arch >>"
         base-image: "amazonlinux:2023.3.20240219.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2023.3.20240219.0"
@@ -256,7 +249,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2023.3.20240219.0-<< matrix.arch >>"
         name: "test on amazonlinux:2023.3.20240219.0-<< matrix.arch >>"
@@ -265,7 +258,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20230418.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230418.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20230418.0"
@@ -274,7 +267,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20230418.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20230418.0-<< matrix.arch >>"
@@ -283,7 +276,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20230320.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230320.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20230320.0"
@@ -292,7 +285,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20230320.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20230320.0-<< matrix.arch >>"
@@ -301,7 +294,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20230307.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230307.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20230307.0"
@@ -310,7 +303,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20230307.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20230307.0-<< matrix.arch >>"
@@ -319,7 +312,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20230221.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230221.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20230221.0"
@@ -328,7 +321,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20230221.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20230221.0-<< matrix.arch >>"
@@ -337,7 +330,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20230207.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230207.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20230207.0"
@@ -346,7 +339,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20230207.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20230207.0-<< matrix.arch >>"
@@ -355,7 +348,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20230119.1-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20230119.1"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20230119.1"
@@ -364,7 +357,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20230119.1-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20230119.1-<< matrix.arch >>"
@@ -373,7 +366,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20221210.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20221210.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20221210.0"
@@ -382,7 +375,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20221210.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20221210.0-<< matrix.arch >>"
@@ -391,7 +384,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20221103.3-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20221103.3"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20221103.3"
@@ -400,7 +393,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20221103.3-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20221103.3-<< matrix.arch >>"
@@ -409,7 +402,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20221004.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20221004.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20221004.0"
@@ -418,7 +411,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20221004.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20221004.0-<< matrix.arch >>"
@@ -427,7 +420,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220912.1-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220912.1"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220912.1"
@@ -436,7 +429,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220912.1-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220912.1-<< matrix.arch >>"
@@ -445,7 +438,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220805.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220805.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220805.0"
@@ -454,7 +447,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220805.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220805.0-<< matrix.arch >>"
@@ -463,7 +456,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220719.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220719.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220719.0"
@@ -472,7 +465,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220719.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220719.0-<< matrix.arch >>"
@@ -481,7 +474,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220606.1-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220606.1"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220606.1"
@@ -490,7 +483,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220606.1-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220606.1-<< matrix.arch >>"
@@ -499,7 +492,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220426.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220426.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220426.0"
@@ -508,7 +501,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220426.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220426.0-<< matrix.arch >>"
@@ -517,7 +510,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220419.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220419.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220419.0"
@@ -526,7 +519,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220419.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220419.0-<< matrix.arch >>"
@@ -535,7 +528,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220406.1-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220406.1"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220406.1"
@@ -544,7 +537,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220406.1-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220406.1-<< matrix.arch >>"
@@ -553,7 +546,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220316.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220316.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220316.0"
@@ -562,7 +555,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220316.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220316.0-<< matrix.arch >>"
@@ -571,7 +564,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220218.1-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220218.1"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220218.1"
@@ -580,7 +573,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220218.1-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220218.1-<< matrix.arch >>"
@@ -589,7 +582,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on amazonlinux:2.0.20220121.0-<< matrix.arch >>"
         base-image: "amazonlinux:2.0.20220121.0"
         build-image: "datadog/docker-library:nginx-datadog-build-amazonlinux_2.0.20220121.0"
@@ -598,7 +591,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on amazonlinux:2.0.20220121.0-<< matrix.arch >>"
         name: "test on amazonlinux:2.0.20220121.0-<< matrix.arch >>"
@@ -607,7 +600,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.4-alpine-<< matrix.arch >>"
         base-image: "nginx:1.25.4-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.4-alpine"
@@ -616,7 +609,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.4-alpine-<< matrix.arch >>"
         name: "test on nginx:1.25.4-alpine-<< matrix.arch >>"
@@ -625,7 +618,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.4-<< matrix.arch >>"
         base-image: "nginx:1.25.4"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.4"
@@ -634,7 +627,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.4-<< matrix.arch >>"
         name: "test on nginx:1.25.4-<< matrix.arch >>"
@@ -643,7 +636,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.3-alpine-<< matrix.arch >>"
         base-image: "nginx:1.25.3-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.3-alpine"
@@ -652,7 +645,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.3-alpine-<< matrix.arch >>"
         name: "test on nginx:1.25.3-alpine-<< matrix.arch >>"
@@ -661,7 +654,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.3-<< matrix.arch >>"
         base-image: "nginx:1.25.3"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.3"
@@ -670,7 +663,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.3-<< matrix.arch >>"
         name: "test on nginx:1.25.3-<< matrix.arch >>"
@@ -679,7 +672,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.2-alpine-<< matrix.arch >>"
         base-image: "nginx:1.25.2-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.2-alpine"
@@ -688,7 +681,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.2-alpine-<< matrix.arch >>"
         name: "test on nginx:1.25.2-alpine-<< matrix.arch >>"
@@ -697,7 +690,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.2-<< matrix.arch >>"
         base-image: "nginx:1.25.2"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.2"
@@ -706,7 +699,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.2-<< matrix.arch >>"
         name: "test on nginx:1.25.2-<< matrix.arch >>"
@@ -715,7 +708,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.1-alpine-<< matrix.arch >>"
         base-image: "nginx:1.25.1-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.1-alpine"
@@ -724,7 +717,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.1-alpine-<< matrix.arch >>"
         name: "test on nginx:1.25.1-alpine-<< matrix.arch >>"
@@ -733,7 +726,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.1-<< matrix.arch >>"
         base-image: "nginx:1.25.1"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.1"
@@ -742,7 +735,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.1-<< matrix.arch >>"
         name: "test on nginx:1.25.1-<< matrix.arch >>"
@@ -751,7 +744,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.0-alpine-<< matrix.arch >>"
         base-image: "nginx:1.25.0-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.0-alpine"
@@ -760,7 +753,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.0-alpine-<< matrix.arch >>"
         name: "test on nginx:1.25.0-alpine-<< matrix.arch >>"
@@ -769,7 +762,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.25.0-<< matrix.arch >>"
         base-image: "nginx:1.25.0"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.25.0"
@@ -778,7 +771,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.25.0-<< matrix.arch >>"
         name: "test on nginx:1.25.0-<< matrix.arch >>"
@@ -787,7 +780,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.24.0-alpine-<< matrix.arch >>"
         base-image: "nginx:1.24.0-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.24.0-alpine"
@@ -796,7 +789,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.24.0-alpine-<< matrix.arch >>"
         name: "test on nginx:1.24.0-alpine-<< matrix.arch >>"
@@ -805,7 +798,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.24.0-<< matrix.arch >>"
         base-image: "nginx:1.24.0"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.24.0"
@@ -814,7 +807,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.24.0-<< matrix.arch >>"
         name: "test on nginx:1.24.0-<< matrix.arch >>"
@@ -823,7 +816,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.4-alpine-<< matrix.arch >>"
         base-image: "nginx:1.23.4-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.4-alpine"
@@ -832,7 +825,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.4-alpine-<< matrix.arch >>"
         name: "test on nginx:1.23.4-alpine-<< matrix.arch >>"
@@ -841,7 +834,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.4-<< matrix.arch >>"
         base-image: "nginx:1.23.4"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.4"
@@ -850,7 +843,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.4-<< matrix.arch >>"
         name: "test on nginx:1.23.4-<< matrix.arch >>"
@@ -859,7 +852,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.3-alpine-<< matrix.arch >>"
         base-image: "nginx:1.23.3-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.3-alpine"
@@ -868,7 +861,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.3-alpine-<< matrix.arch >>"
         name: "test on nginx:1.23.3-alpine-<< matrix.arch >>"
@@ -877,7 +870,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.3-<< matrix.arch >>"
         base-image: "nginx:1.23.3"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.3"
@@ -886,7 +879,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.3-<< matrix.arch >>"
         name: "test on nginx:1.23.3-<< matrix.arch >>"
@@ -895,7 +888,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.2-alpine-<< matrix.arch >>"
         base-image: "nginx:1.23.2-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.2-alpine"
@@ -904,7 +897,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.2-alpine-<< matrix.arch >>"
         name: "test on nginx:1.23.2-alpine-<< matrix.arch >>"
@@ -913,7 +906,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.2-<< matrix.arch >>"
         base-image: "nginx:1.23.2"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.2"
@@ -922,7 +915,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.2-<< matrix.arch >>"
         name: "test on nginx:1.23.2-<< matrix.arch >>"
@@ -931,7 +924,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.1-alpine-<< matrix.arch >>"
         base-image: "nginx:1.23.1-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.1-alpine"
@@ -940,7 +933,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.1-alpine-<< matrix.arch >>"
         name: "test on nginx:1.23.1-alpine-<< matrix.arch >>"
@@ -949,7 +942,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.1-<< matrix.arch >>"
         base-image: "nginx:1.23.1"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.1"
@@ -958,7 +951,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.1-<< matrix.arch >>"
         name: "test on nginx:1.23.1-<< matrix.arch >>"
@@ -967,7 +960,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.0-alpine-<< matrix.arch >>"
         base-image: "nginx:1.23.0-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.0-alpine"
@@ -976,7 +969,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.0-alpine-<< matrix.arch >>"
         name: "test on nginx:1.23.0-alpine-<< matrix.arch >>"
@@ -985,7 +978,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.23.0-<< matrix.arch >>"
         base-image: "nginx:1.23.0"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.23.0"
@@ -994,7 +987,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.23.0-<< matrix.arch >>"
         name: "test on nginx:1.23.0-<< matrix.arch >>"
@@ -1003,7 +996,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.22.1-alpine-<< matrix.arch >>"
         base-image: "nginx:1.22.1-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.22.1-alpine"
@@ -1012,7 +1005,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.22.1-alpine-<< matrix.arch >>"
         name: "test on nginx:1.22.1-alpine-<< matrix.arch >>"
@@ -1021,7 +1014,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.22.1-<< matrix.arch >>"
         base-image: "nginx:1.22.1"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.22.1"
@@ -1030,7 +1023,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.22.1-<< matrix.arch >>"
         name: "test on nginx:1.22.1-<< matrix.arch >>"
@@ -1039,7 +1032,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.22.0-alpine-<< matrix.arch >>"
         base-image: "nginx:1.22.0-alpine"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.22.0-alpine"
@@ -1048,7 +1041,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.22.0-alpine-<< matrix.arch >>"
         name: "test on nginx:1.22.0-alpine-<< matrix.arch >>"
@@ -1057,7 +1050,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         name: "build on nginx:1.22.0-<< matrix.arch >>"
         base-image: "nginx:1.22.0"
         build-image: "datadog/docker-library:nginx-datadog-build-nginx_1.22.0"
@@ -1066,7 +1059,7 @@ workflows:
         <<: *release_tag_only
         matrix:
           parameters:
-            arch: [amd64,arm64]
+            arch: amd64
         requires:
         - "build on nginx:1.22.0-<< matrix.arch >>"
         name: "test on nginx:1.22.0-<< matrix.arch >>"
