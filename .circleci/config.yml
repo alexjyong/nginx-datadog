@@ -14,14 +14,14 @@ executors:
         type: string
     docker:
       - image: << parameters.image >>
-    resource_class: xlarge
+    resource_class: large
   docker-arm64:
     parameters:
       image:
         type: string
     docker:
       - image: << parameters.image >>
-    resource_class: arm.xlarge
+    resource_class: arm.large
 
 jobs:
   build:
