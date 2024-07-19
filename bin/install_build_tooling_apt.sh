@@ -41,7 +41,7 @@ build_libcurl_amd64() {
 # for downloading releases of build dependencies, unpacking them, and building them
 install build-essential libtool autoconf unzip wget tar curl git ca-certificates
 
-install install libcurl4-openssl-dev
+install libcurl4-openssl-dev
 # nproc, etc.
 install coreutils
 
@@ -56,19 +56,19 @@ DEBIAN_FRONTENT=noninteractive apt-get upgrade --yes
 # Install a recent cmake.  We need at least 3.24 (for dd-trace-cpp),
 # but package managers tend to have an earlier version.
 # Kitware releases an installer for glibc-based Linuxen.
-CMAKE_VERSION=3.26.1
-ARCHITECTURE=$(uname -m)
-CMAKE_INSTALLER=cmake-${CMAKE_VERSION}-linux-${ARCHITECTURE}.sh
-URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_INSTALLER}
+# CMAKE_VERSION=3.26.1
+# ARCHITECTURE=$(uname -m)
+# CMAKE_INSTALLER=cmake-${CMAKE_VERSION}-linux-${ARCHITECTURE}.sh
+# URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_INSTALLER}
 
-cd /tmp
-if ! wget "${URL}"; then
-    >&2 echo "wget failed to download \"${URL}\"."
-    exit 1
-fi
+# cd /tmp
+# if ! wget "${URL}"; then
+#     >&2 echo "wget failed to download \"${URL}\"."
+#     exit 1
+# fi
 
 
-chmod +x "${CMAKE_INSTALLER}"
-./"${CMAKE_INSTALLER}" --skip-license --prefix=/usr/local --exclude-subdir
-rm "${CMAKE_INSTALLER}"
-build_libcurl_amd64
+# chmod +x "${CMAKE_INSTALLER}"
+# ./"${CMAKE_INSTALLER}" --skip-license --prefix=/usr/local --exclude-subdir
+# rm "${CMAKE_INSTALLER}"
+# build_libcurl_amd64

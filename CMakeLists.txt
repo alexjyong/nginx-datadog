@@ -69,6 +69,10 @@ target_include_directories(ngx_http_datadog_module
     ${CMAKE_SOURCE_DIR}/lib/  # Assuming you copied dd-trace-cpp headers to a 'lib' directory
 )
 
+add_dependencies(ngx_http_datadog_module
+  nginx_module
+)
+
 # Link against the imported static library
 target_link_libraries(ngx_http_datadog_module dd_trace_cpp-static nginx_module)
 
