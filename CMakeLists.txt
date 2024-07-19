@@ -27,13 +27,14 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   # This warning has a false positive. See
   # <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108088>.
   add_compile_options(-Wno-error=free-nonheap-object -Wno-error=maybe-uninitialized)
-
 endif()
 
 # Nginx module boilerplate (code within the nginx repository)
 include(./nginx-module.cmake)
 
-add_subdirectory(./dd-trace-cpp EXCLUDE_FROM_ALL)
+# Import pre-built dd_trace_cpp-static
+add_library(dd_trace_cpp-static STATIC IMPORTED)
+set_target_properties(dd_trace_cpp-static PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/libdd_trace_cpp-static.a)
 
 # The shared library (nginx module) that we are building.
 add_library(ngx_http_datadog_module SHARED)
@@ -65,14 +66,11 @@ target_sources(ngx_http_datadog_module
 target_include_directories(ngx_http_datadog_module
   PRIVATE
     src/
+    ${CMAKE_SOURCE_DIR}/lib/  # Assuming you copied dd-trace-cpp headers to a 'lib' directory
 )
 
-add_dependencies(ngx_http_datadog_module
-  nginx_module
-  dd_trace_cpp-objects
-)
-
-target_link_libraries(ngx_http_datadog_module dd_trace_cpp-objects nginx_module)
+# Link against the imported static library
+target_link_libraries(ngx_http_datadog_module dd_trace_cpp-static nginx_module)
 
 # Remove the "lib" prefix to match NGINX convention
 set_property(TARGET ngx_http_datadog_module PROPERTY PREFIX "")
@@ -85,4 +83,3 @@ if(CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
     target_link_libraries(ngx_http_datadog_module -static-libstdc++ -static-libgcc) 
   endif()
 endif()
-
