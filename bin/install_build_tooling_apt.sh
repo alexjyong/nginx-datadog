@@ -12,6 +12,32 @@ install() {
     DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet "$@"
 }
 
+build_libcurl_amd64() {
+  if [ "$(uname -m)" = "x86_64" ]; then
+    # Install necessary development libraries
+    apt update
+    apt install -y libssl-dev
+
+    # Download libcurl source code (replace with desired version)
+    wget https://curl.se/download/curl-7.88.1.tar.gz
+    tar -xzf curl-7.88.1.tar.gz
+    cd curl-7.88.1
+
+    # Set the necessary flags
+    export CFLAGS="-fPIC"
+    export CXXFLAGS="-fPIC"
+
+    # Configure and build with -fPIC and OpenSSL
+    ./configure --with-pic --enable-shared --enable-static --with-openssl
+    make -j "$(nproc)"
+    make install
+
+    # Clean up
+    cd ..
+    rm -rf curl-7.88.1 curl-7.88.1.tar.gz
+  fi
+}
+
 # for downloading releases of build dependencies, unpacking them, and building them
 install build-essential libtool autoconf unzip wget tar curl git ca-certificates
 
@@ -46,29 +72,3 @@ chmod +x "${CMAKE_INSTALLER}"
 ./"${CMAKE_INSTALLER}" --skip-license --prefix=/usr/local --exclude-subdir
 rm "${CMAKE_INSTALLER}"
 build_libcurl_amd64
-
-build_libcurl_amd64() {
-  if [ "$(uname -m)" = "x86_64" ]; then
-    # Install necessary development libraries
-    apt update
-    apt install -y libssl-dev
-
-    # Download libcurl source code (replace with desired version)
-    wget https://curl.se/download/curl-7.88.1.tar.gz
-    tar -xzf curl-7.88.1.tar.gz
-    cd curl-7.88.1
-
-    # Set the necessary flags
-    export CFLAGS="-fPIC"
-    export CXXFLAGS="-fPIC"
-
-    # Configure and build with -fPIC and OpenSSL
-    ./configure --with-pic --enable-shared --enable-static --with-openssl
-    make -j "$(nproc)"
-    make install
-
-    # Clean up
-    cd ..
-    rm -rf curl-7.88.1 curl-7.88.1.tar.gz
-  fi
-}
