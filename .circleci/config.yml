@@ -39,8 +39,8 @@ jobs:
     - run: printf 'NGINX_VERSION=%s\n' << parameters.nginx-version >> >>nginx-version-info
     - run: printf 'BASE_IMAGE=%s\n' '<< parameters.base-image >>' >>nginx-version-info
     - run: printf 'ARCH=%s\n' '<< parameters.arch >>' >>nginx-version-info
-    # - run: gzip -d lib/libdd_trace_cpp-static.a.gz
-    # - run:
+    - run: gzip -d lib/libdd_trace_cpp-static.a.gz
+    - run:
         command: make build
         environment:
           BUILD_TYPE: Release
